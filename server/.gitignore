@@ -1,0 +1,4 @@
+!.env.example
+
+# ignore all in nodes :: this will be the containers
+nodes/*
