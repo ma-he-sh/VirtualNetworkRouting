@@ -1,10 +1,19 @@
-version: "3.9"
+version: "3"
+
+networks:
+  static-network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
 
 services:
-  webserver:
+  web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: web_server
+    container_name: web
+    networks:
+      static-network:
+        ipv4_address: 172.20.0.2
     ports:
       - 8080:8080

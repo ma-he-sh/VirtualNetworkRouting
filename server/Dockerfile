@@ -3,9 +3,7 @@ RUN pip install flask
 RUN pip install python-dotenv
 RUN pip install colorama
 
-WORKDIR /server
-
-COPY ./app /server
+COPY . .
 
 ENTRYPOINT ["python"]
-CMD ["server.py"]
+CMD ["/app/server.py"]

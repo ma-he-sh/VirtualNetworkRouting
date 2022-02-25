@@ -1,8 +1,8 @@
 
 class Node:
-    def __init__(self, node_id, ip, cost=0):
+    def __init__(self, node_id, node_name, cost=0):
         self.node_id = node_id
-        self.ip = ip
+        self.node_name = node_name
         self.cost = cost
 
     def create(self):

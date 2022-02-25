@@ -1,9 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-
+        <meta charset="utf-8">
+        <title>Virtual Network Routing</title>
+        <script src="{{ url_for('static', filename='assets/jquery-3.6.0.min.js')  }}"></script>
     </head>
     <body>
-        PageContent
+        <div>
+            <input type="number" name="node_cost" />
+            <input type="text" name="node_name" />
+            <button data-action="create_node">Create Node</button>
+        </div>
+        <br>
+        <div>
+            <button data-action="deploy_nodes">Deploy</button>
+        </div>
+        <button>Create Sessions</button>
     </body>
+
+    <script src="{{ url_for('static', filename='assets/main.js') }}"></script>
 </html>
