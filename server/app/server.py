@@ -12,6 +12,8 @@ db.create_tables()
 
 app = Flask(__name__)
 
+defaultSession = "86ab42ee-8b2e-4b00-b306-e8483698ef2f"
+
 @app.route("/")
 def main():
     return render_template("index.html")
@@ -37,19 +39,24 @@ def deploy_nodes():
     nodes = request.json['nodes']
 
     # clear current sessions
-    db.delete_session( '' )
+    db.delete_session( defaultSession )
 
     # create session
-    db.create_session( '86ab42ee-8b2e-4b00-b306-e8483698ef2f', 'current_session' )
+    db.create_session( defaultSession, 'current_session' )
 
     nodeArr = []
-    for i in nodes:
-        nodeArr.append( Node( 'node_' + str(i), nodes[i]['name'], nodes[i]['cost'] ) )
-
-    # save data on db
-
-
-    pass
+    index = 0
+    for key in nodes:
+        nodeObj = Node( index, key['name'], key['cost'] )
+        nodeArr.append( nodeObj )
+        print(nodeObj.getIP())
+        index+=1
+    
+    print(nodeArr)
+    return jsonify(
+        error=False,
+        code='nodes_saved'
+    )
 
 @app.route("/destroy_nodes", methods=["POST"])
 def destroy_nodes():

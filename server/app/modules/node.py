@@ -1,7 +1,9 @@
+import yaml
+ipStart = "172.16.238."
 
 class Node:
-    def __init__(self, node_id, node_name, cost=0):
-        self.node_id = node_id
+    def __init__(self, index, node_name, cost=0):
+        self.index = index
         self.node_name = node_name
         self.cost = cost
 
@@ -19,8 +21,11 @@ class Node:
         """
         pass
 
+    def getNodeName(self):
+        return "node_" + str(self.index)
+
     def getIP(self):
-        return self.ip
+        return ipStart + str( 10 + self.index )
 
     def getCost(self):
         return self.cost
@@ -28,3 +33,5 @@ class Node:
     def getNodeID(self):
         return self.node_id
 
+    def writeToContainer(self):
+        pass

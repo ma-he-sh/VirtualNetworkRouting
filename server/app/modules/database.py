@@ -28,7 +28,7 @@ class DB:
 
     def create_tables(self):
         self.conn.execute('''CREATE TABLE IF NOT EXISTS sess(
-        session text primary key,
+        sessID text primary key,
         session_name text
         )''')
         self.conn.commit()
@@ -56,7 +56,7 @@ class NetworkDB(DB):
     def create_session(self, sessID, sessName ):
         conn = self.get_conn()
         c = conn.cursor()
-        c.execute("INSERT OR REPLACE INTO sess(session, session_name) VALUES (?, ?)", (sessID, sessName))
+        c.execute("INSERT OR REPLACE INTO sess(sessID, session_name) VALUES (?, ?)", (sessID, sessName))
         conn.commit()
         conn.close()
 
@@ -70,9 +70,12 @@ class NetworkDB(DB):
     def delete_session(self, sessID ):
         conn = self.get_conn()
         c = conn.cursor()
-        c.execute("DELETE FROM sess WHERE session=?", (sessID))
-        conn.execute()
+        sql = "DELETE FROM sess WHERE sessID='{sessID}'".format(sessID=sessID)
+        c.execute(sql)
+        conn.commit()
 
-        c.execute("DELETE FROM nodes WHERE sessID=?", (sessID))
-        conn.execute()
+        sql = "DELETE FROM nodes WHERE sessID='{sessID}'".format(sessID=sessID)
+        c.execute(sql)
+        conn.commit()
+
         conn.close()
