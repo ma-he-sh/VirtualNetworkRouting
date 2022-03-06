@@ -7,10 +7,145 @@
     </head>
     <style>
         body {
-            background: #000;
+            background: #0e141f;
+            font-family: monospace;
+        }
+        .app--window {
+            width: 100%;
+            min-width: 300px;
+            max-width: 800px;
+            position: fixed;
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+
+            border: 1px solid #eee;
+            border-radius: 5px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .app--window .app--section .app--node {
+            width: 80px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            color: #fff;
+            background-color: #485a6c;
+            border-radius: 25px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            float: left;
+        }
+        .app--window .distance_vector_network {
+            width: 100%;
+            float: left;
+            background-color: #273445;
+            margin-bottom: 10px;
+            border-radius: 2.5px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .app--window .distance_vector_combinations {
+            width: 100%;
+            float: left;
+            background-color: #273445;
+            margin-bottom: 10px;
+            border-radius: 2.5px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .app--window .distance_vector_combinations .app--section,
+        .app--window .distance_vector_network .app--section,
+        .app--window .distance_vector_deploy .app--section  {
+            width: 100%;
+            float: left;
+            padding: 0px 0px 10px 0px;
+        }
+
+        .app--window #app--nodes,
+        .app--window #app--nodes--comb {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px 0px 10px 0px;
+            box-sizing: border-box;
+        }
+        .app--window #app--nodes--comb .app--comb {
+            width: 100%;
+            float: left;
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .app--window #app--nodes--comb .app--comb .prop-1,
+        .app--window #app--nodes--comb .app--comb .prop-2,
+        .app--window #app--nodes--comb .app--comb .prop--cost {
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            float: left;
+        }
+        .app--window #app--nodes--comb .app--comb .prop-1,
+        .app--window #app--nodes--comb .app--comb .prop-2 {
+            width: 80px;
+            color: #fff;
+            background-color: #485a6c;
+            border-radius: 12px;
+            margin-right: 10px;
+        }
+        .app--window #app--nodes--comb .app--comb .prop--cost {
+            width: 100%;
+        }
+        .app--window #app--nodes--comb .app--comb .prop--cost .prop--value {
+            height: 24px;
+            border-style: none;
+            float: left;
+            line-height: 24px;
+            width: 100px;
+            border-radius: 2.5px;
+            text-indent: 10px;
+            box-sizing: border-box;
+        }
+
+        .app--window #app--create-comb {
+            color: #fff;
+        }
+        .app--window #app--add-node,
+        .app--window #app--create-deploy {
+            width: 120px;
+            color: #fff;
+            line-height: 24px;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            background-color: #002e99;
+        }
+        .app--window #app--add-node:hover,
+        .app--window #app--create-deploy:hover {
+            background-color: #0d52bf;
         }
     </style>
-    <body>
+    <body class="app--window">
+        <div class="distance_vector_network">
+            <section class="app--section">
+                <div id="app--add-node">ADD NODE</div> 
+                <div id="app--nodes"></div>
+            </section>           
+        </div>
+        <!--node combinations-->
+        <div class="distance_vector_combinations">
+            <section class="app--section">
+                <div id="app--create-comb">COMBINATION</div> 
+                <div id="app--nodes--comb"></div>
+            </section>
+        </div>
+        <!--node deploy-->
+        <div class="distance_vector_deploy">
+            <section class="app--section">
+                <div id="app--create-deploy">DEPLOY</div> 
+            </section>
+        </div>
+
+
         <div>
             <input type="number" name="node_cost" />
             <input type="text" name="node_name" />
