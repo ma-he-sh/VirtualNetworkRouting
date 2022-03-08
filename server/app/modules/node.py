@@ -29,6 +29,7 @@ class Node:
 
     def create(self):
         getIP = self.getIP()
+        print(getIP)
         docker = Dockerize( self.name, getIP )
         docker.generate()
 

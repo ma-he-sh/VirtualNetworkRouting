@@ -15,9 +15,9 @@ class Dockerize:
             "networks": {
                 "container_net": {
                     "ipam": {
-                        "config": {
-                            "subnet": "172.20.0.0/24",
-                        }
+                        "config": [
+                            {"subnet": "172.20.0.0/24"},
+                        ]
                     }
                 }
             },

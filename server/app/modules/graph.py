@@ -38,6 +38,7 @@ class Graphs:
             while ( i < len(path) - 1 ):
                 nodeObj = Node( index, path[i], path[i+1] )
                 nodeArr.append(nodeObj)
+                index += 1
                 i+=1
 
         return path, nodeArr
