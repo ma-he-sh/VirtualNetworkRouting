@@ -1,14 +1,15 @@
+import json
 from flask import Flask, render_template, jsonify, request
 from dotenv import load_dotenv
 import os
 import sys
 
-from modules.node import Node
-
 # database intialization
 from modules.database import NetworkDB
 db = NetworkDB()
 db.create_tables()
+
+from modules.graph import Graphs
 
 app = Flask(__name__)
 
@@ -35,24 +36,38 @@ def deploy_nodes():
             error=True,
             code='empty_nodes'
         )
+    
+    if 'cost' not in request.json:
+        return jsonify(
+            error=True,
+            code='invalid_request'
+        )
 
     nodes = request.json['nodes']
+    nodeComb  = request.json['cost']
 
-    # clear current sessions
-    db.delete_session( defaultSession )
+    print( nodeComb )
 
-    # create session
-    db.create_session( defaultSession, 'current_session' )
+    graph = Graphs( nodes, nodeComb )
+    graph.get_solution( nodes[len(nodes) - 1] )
 
-    nodeArr = []
-    index = 0
-    for key in nodes:
-        nodeObj = Node( index, key['name'], key['cost'] )
-        nodeArr.append( nodeObj )
-        print(nodeObj.getIP())
-        index+=1
+    path = graph.getSolution()
+    print(path)
+
+    # # clear current sessions
+    # db.delete_session( defaultSession )
+
+    # # create session
+    # db.create_session( defaultSession, 'current_session' )
+
+    # nodeArr = []
+    # index = 0
+    # for key in nodes:
+    #     nodeObj = Node( index, key['name'], key['cost'] )
+    #     nodeArr.append( nodeObj )
+    #     print(nodeObj.getIP())
+    #     index+=1
     
-    print(nodeArr)
     return jsonify(
         error=False,
         code='nodes_saved'

@@ -11,6 +11,19 @@
 
     var save_combo=[];
 
+    function rest( url, type, data={} ) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: url,
+                type: type,
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: resolve,
+                error: reject
+            })
+        });
+    }
+
     function update_node_list( letter ) {
         $( app_nodes ).append( "<div class='app--node'>"+letter+"</div>" );
         $( app_nodes_comb ).html('');
@@ -65,13 +78,28 @@
         save_combo = [];
         if( nodes.length > 1 ) {
             $('[data-prop-comb]').each(function() {
+                var cost = parseInt( $(this).val() );
+                if ( cost == NaN ) {
+                    cost = 0;
+                }
                 save_combo.push({
                     'node1': $(this).data("prop1"),
                     'node2': $(this).data("prop2"),
-                    'cost' : parseInt( $(this).val() ),
+                    'cost' : cost,
                 });
+            });
+            
+            var data = {
+                'cost' : save_combo,
+                'nodes': nodes,
+            }
 
-                console.log( save_combo );
+            rest( "/deploy_nodes", "post", data ).then(function(res) {
+                console.log(res)
+            }).catch(function(err) {
+                console.log(err)
+            }).finally(function() {
+                save_combo = [];
             });
         } else {
             console.error("Invalid Node Size");
@@ -114,19 +142,6 @@
                 print("no action")
         }
     });
-
-    function rest( url, type, data={} ) {
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                url: url,
-                type: type,
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                success: resolve,
-                error: reject
-            })
-        });
-    }
 
     function create_node() {
         var node_cost = parseInt( $('input[name="node_cost"]').val() );

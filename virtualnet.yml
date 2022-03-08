@@ -6,6 +6,7 @@ dependencies:
   - flask
   - requests
   - pip:
+      - networkx
       - pyyaml
       - requests
       - python-dotenv
