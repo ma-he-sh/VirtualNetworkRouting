@@ -1,6 +1,7 @@
 from modules.dockerize import Dockerize
 ipStart = "172.20.0."
 
+CONTAINER_DIR="./containers/"
 
 class Node:
     def __init__(self, index, name, sendto):
@@ -8,6 +9,7 @@ class Node:
         self.name  = name
         self.index = index
         self.payload = None
+        self.docker_container_name = "router_" + name
 
     def setPayload(self, payload=None):
         self.payload = payload
@@ -29,12 +31,33 @@ class Node:
 
     def create(self):
         getIP = self.getIP()
-        print(getIP)
-        docker = Dockerize( self.name, getIP )
-        docker.generate()
+        getPort = self.getPort()
+
+        router_name = "router_" + self.name.lower()
+
+        entry = {
+            "build": {
+                "context": ".",
+                "dockerfile": "Dockerfile",
+            },
+            "container_name": router_name,
+            "ports": [
+                str(getPort) + ":8080"
+            ],
+            "networks": {
+                "container_net": {
+                    "ipv4_address": getIP
+                }
+            }
+        }
+
+        return entry, router_name
 
     def getIP(self):
         return ipStart + str(self.index)
+    
+    def getPort(self):
+        return "80" + str(self.index)
 
     def getStatus(self):
         pass

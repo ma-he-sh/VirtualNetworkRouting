@@ -1,6 +1,8 @@
 import pickle
 from modules.node import Node
 import os.path
+
+from modules.dockerize import Dockerize
 PIK = "session.dat"
 
 class NodeHandler:
@@ -24,5 +26,12 @@ class NodeHandler:
 
     def generateContainers(self):
         if len(self.nodeArr) > 0:
+            routers = {}
             for node in self.nodeArr:
-                node.create()
+                entry, router = node.create() 
+                routers[router] = entry
+
+            # deploy containers
+            docker = Dockerize( "session", routers )
+            docker.generate()
+            docker.exec()

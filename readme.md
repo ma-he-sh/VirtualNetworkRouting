@@ -8,5 +8,7 @@ conda env create -f virtualnet.yml
 conda activate virtualnet
 ```
 
-# TODO
-
+# Monitor Containers
+```sh
+watch docker ps
+```

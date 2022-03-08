@@ -1,13 +1,16 @@
+from sys import stderr, stdout
 import yaml
 import io
+from os import path
+import subprocess
 
 CONTAINER_DIR="./containers/"
 
 class Dockerize:
-    def __init__(self, name, ip):
-        self.name = "router_"+name
-        self.docker_file_name = CONTAINER_DIR + "docker-composer-" + name + ".yaml"
-        self.ip   = ip
+    def __init__(self, sess_name, routers=[] ):
+        self.name = "session_"+sess_name
+        self.docker_file_name = CONTAINER_DIR + "docker-composer-" + sess_name + ".yaml"
+        self.routers = routers
 
     def generate(self):
         entry = {
@@ -21,21 +24,18 @@ class Dockerize:
                     }
                 }
             },
-            "services": {
-                "web": {
-                    "build": {
-                        "context": ".",
-                        "dockerfile": "Dockerfile",
-                    },
-                    "container_name": self.name,
-                    "networks": {
-                        "container_net": {
-                            "ipv4_address": self.ip
-                        }
-                    }
-                }
-            }
+            "services": {}
         }
+
+        if len(self.routers) > 0:
+            entry["services"] = self.routers 
 
         with io.open( self.docker_file_name, "w", encoding="utf8" ) as file:
             yaml.dump( entry, file, default_flow_style=False, allow_unicode=True )
+
+    def exec(self):
+        if path.exists( self.docker_file_name ):
+            process = subprocess.Popen(['docker-compose', '-f', self.docker_file_name, 'up'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+            print(stdout, stderr)
+            print("STARTED")
