@@ -1,5 +1,6 @@
+from platform import node
 from modules.node import Node
-import networkx
+import networkx as net
 
 class NegativeCycles(Exception):
     pass
@@ -7,17 +8,15 @@ class NegativeCycles(Exception):
 class Graphs:
     def __init__(self, nodes, nodeComb ):
         self.nodes = nodes
-        self.nodeComb = self._prepareNodes( nodeComb )
+        self.nodeComb = nodeComb
+        self.graph = net.Graph()
         self.num_vertex = len(self.nodes)
         self.solution = {}
 
-    def _prepareNodes(self, nodeComb):
-        nodeArr = []
-        for key in nodeComb:
+    def _prepareNodes(self):
+        for key in self.nodeComb:
             if key['cost'] is not None:
-                nodeObj = Node( key['node1'], key['node2'], key['cost'] )
-                nodeArr.append( nodeObj )
-        return nodeArr
+                self.graph.add_edge( key['node1'], key['node2'], weight=key['cost'] )
 
     def getNodes(self):
         return self.nodes
@@ -25,40 +24,20 @@ class Graphs:
     def getCosts(self):
         return self.costs
 
-    def get_solution(self, start_node):
-        # bellman ford distance calculation
-        # 1 assign infinity as the default distance
-        #self.solution = {} # stores the distance
-        #if self.num_vertex <= 0: return False
+    def get_solution(self, start, end ):
+        self._prepareNodes()
+        path = net.shortest_path(self.graph, start, end, weight='weight')
 
-        # for node in self.nodes:
-        #     self.solution[node] = float("Inf")
+        nodeArr = []
+        index = 20 # padding for ip
+        i = 0
 
-        # self.solution[start_node] = 0
+        if len(path) > 1:
+            # add observation node
+            path.append("OBSERVER")
+            while ( i < len(path) - 1 ):
+                nodeObj = Node( index, path[i], path[i+1] )
+                nodeArr.append(nodeObj)
+                i+=1
 
-        # for vertex in range(self.num_vertex - 1):
-        #     for node in self.nodeComb:
-        #         start = node.getStart()
-        #         end   = node.getEnd()
-        #         cost  = node.getCost()
-
-        #         if self.solution[ start ] != float("Inf") and self.solution[ start ] + cost < self.solution[ end ]:
-        #             self.solution[ end ] = self.solution[ start ] + cost
-
-        # print(self.solution)
-
-        # # determine if graph contains negative edges
-        # for node in self.nodeComb:
-        #     start = node.getStart()
-        #     end   = node.getEnd()
-        #     cost  = node.getCost()
-
-        #     if self.solution[ start ] != float("Inf") and self.solution[ start ] + cost < self.solution[ end ]:
-        #         raise NegativeCycles('Contain negative cycles')
-
-
-
-        return self.solution
-    
-    def getSolution(self):
-        return self.solution
+        return path, nodeArr

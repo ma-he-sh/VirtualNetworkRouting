@@ -10,6 +10,7 @@ db = NetworkDB()
 db.create_tables()
 
 from modules.graph import Graphs
+from modules.handler import NodeHandler
 
 app = Flask(__name__)
 
@@ -46,36 +47,33 @@ def deploy_nodes():
     nodes = request.json['nodes']
     nodeComb  = request.json['cost']
 
-    print( nodeComb )
+    startNode = nodes[0]
+    endNode   = nodes[len(nodes) - 1]
 
     graph = Graphs( nodes, nodeComb )
-    graph.get_solution( nodes[len(nodes) - 1] )
+    path, nodeArr = graph.get_solution( startNode, endNode )
 
-    path = graph.getSolution()
-    print(path)
+    # save the current data as a session
+    NodeHandler.saveNodes( nodeArr )
 
-    # # clear current sessions
-    # db.delete_session( defaultSession )
-
-    # # create session
-    # db.create_session( defaultSession, 'current_session' )
-
-    # nodeArr = []
-    # index = 0
-    # for key in nodes:
-    #     nodeObj = Node( index, key['name'], key['cost'] )
-    #     nodeArr.append( nodeObj )
-    #     print(nodeObj.getIP())
-    #     index+=1
+    # create containers
+    handler = NodeHandler( nodeArr, startNode )
+    handler.generateContainers()
     
     return jsonify(
         error=False,
-        code='nodes_saved'
+        start=startNode,
+        end=endNode,
+        path=path,
+        code='path_generated'
     )
 
 @app.route("/destroy_nodes", methods=["POST"])
 def destroy_nodes():
-    pass
+    # check if data exists
+    sessionExists = NodeHandler.sessionExists()
+    if sessionExists:
+        NodeHandler.saveNodes([])
 
 @app.route("/send_packet", methods=["POST"])
 def send_packet():
