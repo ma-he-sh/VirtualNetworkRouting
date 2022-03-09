@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='s1.css')}}">
+        <title> Graphical Representation</title>
+    </head>
+    
+    <body>
+        <nav class="navbar navbar-dark bg-dark">
+            <span class="navbar-text" >
+              Virtualized network!
+            </span>
+          </nav>
+        
+        <table class="view" align="center">
+            <!-- Table headers -->
+                <th>
+                    <tr style="color: green; ">	
+                    <td>Node Number</td>
+                    <td>Cost</td>
+            </tr>
+                </th>
+                
+                <tr>{% for item in values %}                     
+                    <td>{{item.source_no}}->{{item.destination_no}}</td>
+                    <td>{{item.cost}}</td>
+                </tr>
+                    {% endfor %}
+    </table>   
+    </body>
+</html>

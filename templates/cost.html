@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='s1.css')}}">
+	<title>Nodes Deployment</title>
+</head>
+
+<body>
+	<nav class="navbar navbar-dark bg-dark">
+		<span class="navbar-text" >
+		  Virtualized network!
+		</span>
+	  </nav>
+	  
+<table  class="temp">
+<!-- Table headers -->
+<th>
+		<tr style="color: green; ">	
+		<td>Node Number</td>
+		<td>Cost</td>
+</tr>
+	</th>
+	
+<div class="him">
+{% set s = total| int %}
+{% for i in range(0,s) %}
+<div class="tv" >{{i}}</div> 
+</div>
+{% endfor %}
+<tr>
+	{% if s>=4 %}
+	{% for i in range(0,s) %}
+		{% for j in range((i+1),s) %}
+	<td><form  method="post" action="/grab" >
+		<input class="cost" type="number" name="source[]" placeholder="Enter number not more than 10"  min="0" max="10"  required> -> <input class="cost" type="number" name="destination[]" placeholder="Enter number not more than 10"  min="0" max="10"  required></td>
+		<td>	
+        <input class="cost" type="number" name="dist[]" placeholder="Enter number not more than 10"  min="0" max="10"  required>
+	</td>	
+</tr>
+{% endfor %}
+{% endfor %}
+<tr>
+	{% elif s==3 %}
+	{% for i in range(0,s) %}		
+	<td><form  method="post" action="/grab" >
+		<input class="cost" type="number" name="source[]" placeholder="Enter number not more than 10"  min="0" max="10"  required> -> <input class="cost" type="number" name="destination[]" placeholder="Enter number not more than 10"  min="0" max="10"  required></td>
+		<td><input class="cost" type="number" name="dist[]" placeholder="Enter number not more than 10"  min="0" max="10"  >
+	</td>	
+</tr>
+{% endfor %}
+<tr>
+	{% else %}
+		<td><form  method="post" action="/grab" >
+		<input class="cost" type="number" name="source[]" placeholder="Enter number not more than 10"  min="0" max="10"  required> -> <input class="cost" type="number" name="destination[]" placeholder="Enter number not more than 10"  min="0" max="10"  required></td>
+		<td>	
+        <input class="cost" type="number" name="dist[]" placeholder="Enter number not more than 10"  min="0" max="10"  required>
+	</td>	
+</tr>
+{% endif %}	
+</table>
+	<button class="align-center" type="Submit" value="">Deploy</button> 
+		</form>	
+	
+</body>
+</html>
