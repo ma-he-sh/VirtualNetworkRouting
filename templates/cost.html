@@ -47,7 +47,7 @@
 	{% for i in range(0,s) %}		
 	<td><form  method="post" action="/grab" >
 		<input class="cost" type="number" name="source[]" placeholder="Enter number not more than 10"  min="0" max="10"  required> -> <input class="cost" type="number" name="destination[]" placeholder="Enter number not more than 10"  min="0" max="10"  required></td>
-		<td><input class="cost" type="number" name="dist[]" placeholder="Enter number not more than 10"  min="0" max="10"  >
+		<td><input class="cost" type="number" name="dist[]" placeholder="Enter number not more than 10"  min="0" max="100"  >
 	</td>	
 </tr>
 {% endfor %}
