@@ -27,7 +27,8 @@
         .router--content .router--name,
         .router--content .router--ip,
         .router--content .router--message,
-        .router--content .router--timestamp {
+        .router--content .router--timestamp,
+        .router--content .router--from {
             width: 100%;
             line-height: 40px;
             text-align: center;
@@ -45,6 +46,9 @@
         .router--content .router--timestamp {
             font-size: 16px;
         }
+        .router--content .router--from {
+            font-size: 16px;
+        }
     </style>
     <body>
         <div id='router--window' class='router--window'>
@@ -53,6 +57,7 @@
                 <div class='router--ip'>ROUTER {{router_ip}}</div>
                 <div data-content='message' class='router--message'></div>
                 <div data-content='timestamp' class='router--timestamp'></div>
+                <div data-content='from' class='router--from'></div>
             </div>
         </div>
         <script>
@@ -78,6 +83,7 @@
                             jQuery('#router--window .router--content').addClass('recieved');
                             jQuery('[data-content="message"]').html(resp.router_message);
                             jQuery('[data-content="timestamp"]').html(resp.router_timestamp);
+                            jQuery('[data-content="from"]').html(resp.router_from);
                         }
                     }
                 }).catch(function(err) {

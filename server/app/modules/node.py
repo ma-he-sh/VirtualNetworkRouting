@@ -62,7 +62,7 @@ class Node:
 
     def getHost(self, path=""):
         ip = self.getIP()
-        port = self.getPort()
+        port = "8080"
         return "http://{ip}:{port}{path}".format(ip=ip, port=port, path=path)
     
     def getPort(self):

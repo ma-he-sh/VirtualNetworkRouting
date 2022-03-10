@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import json
 import os
 import time
+import requests
 
 app = Flask(__name__)
 
@@ -46,15 +47,23 @@ def status():
 
     router_message = ""
     router_timestamp= ""
+    router_from = ""
     if has_message:
         router_message = data['message']
         router_timestamp = data['timestamp']
         router_routes    = data['routes']
+        router_from      = "RECIEVED FROM: " + data['from']
 
-        next_ip = None
+        next_node = None
+        next_host = None
+        next_ip   = None
         if ROUTER_NAME in router_routes:
             router_routes[ROUTER_NAME]['recieved'] = True
-            next_ip =  router_routes[ROUTER_NAME]['next']
+            next_ip =  router_routes[ROUTER_NAME]['ip']
+            next_node =  router_routes[ROUTER_NAME]['next']
+        
+        if next_node in router_routes:
+            next_host = router_routes[next_node]['node_route']
 
         payload = {
             'message': router_message,
@@ -63,16 +72,25 @@ def status():
         }
 
         # send message to next router
-        print( router_routes )
-        print(next_ip)
-
-        # TODO send message to next container >>
+        if next_node != "OBSERVER" and next_node is not None:
+            # send message to next container
+            try:
+                headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+                resp = requests.post( next_host, data=json.dumps(payload), headers=headers )
+                data = resp.json()
+                payload_sent=bool(data['recieved'])
+            except Exception as ex:
+                print(ex)
+                pass
+            finally:
+                Router.clear() # clear current data
 
     return jsonify(
         status=True,
         has_message=has_message,
         router_message=router_message,
         router_timestamp=router_timestamp,
+        router_from=router_from
     )
 
 @app.route("/info")
@@ -93,11 +111,13 @@ def set_packet():
     
     payload = request.json['message']
     routes  = request.json['routes']
+    fromNode= request.json['from']
 
     data = {
         'message': payload,
         'routes' : routes,
-        'timestamp': time.time()
+        'timestamp': time.time(),
+        'from'   : fromNode,
     }
     recieved = Router.save(data)
 

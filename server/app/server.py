@@ -1,3 +1,4 @@
+from email import header
 import json
 from flask import Flask, render_template, jsonify, request
 from dotenv import load_dotenv
@@ -103,7 +104,7 @@ def send_packet():
     # get current session
     nodeArr = NodeHandler.getNodes()
     
-    payoad_sent = False
+    payload_sent = False
     if len(nodeArr) > 1:
         # prepare payload
         payload = {
@@ -119,22 +120,24 @@ def send_packet():
             curr_node = node.getName()
             curr_ip   = node.getIP()
             next_node = node.getNext()
-            next_route= node.getHost('/set_packet')
+            node_route= node.getHost('/set_packet')
 
             payload['routes'][curr_node] = {
                 'ip' : curr_ip,
                 'recieved': False,
                 'next' : next_node,
-                'next_host' : next_route,
+                'node_route' : node_route,
             }
 
         if next_ip is not None:
             try:
-                resp = requests.post( next_host, data=payload )
-                print(resp.json)
-                payload_sent=True
+                headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+                resp = requests.post( next_host, data=json.dumps(payload), headers=headers )
+                data = resp.json()
+                payload_sent=bool(data['recieved'])
             except Exception as ex:
                 print(ex)
+                print(next_host)
                 print(payload)
                 payload_sent=False,
             finally:
@@ -144,7 +147,7 @@ def send_packet():
     return jsonify(
         error=False,
         code='packet_sent',
-        sent=payoad_sent,
+        sent=payload_sent,
     )
 
 @app.route("/set_status", methods=["POST"])
