@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %} Home Page{% endblock %}
+		
+		{% block content %}
+		
+			
+			<form class="hon" method="post" action="http://localhost:5000/total">			
+				<p>Please enter the number of nodes you would like</p><input type="number" name="Node" placeholder="Enter number not more than 10"  min="0" max="10"  align="center" required>
+				<button class="add" type="Submit" value="">Submit</button> 
+		</form>
+		<div class="subfooter">
+			<p>Note: Nodes should not be more than 10.</p></div>
+{% endblock %}
