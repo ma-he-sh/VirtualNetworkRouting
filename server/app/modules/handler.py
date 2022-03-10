@@ -21,7 +21,7 @@ class NodeHandler:
             return pickle.load(f)
 
     @staticmethod
-    def sessionExists(self):
+    def sessionExists():
         return os.path.exists( PIK )
 
     def generateContainers(self):

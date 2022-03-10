@@ -3,6 +3,7 @@ from flask import Flask, render_template, jsonify, request
 from dotenv import load_dotenv
 import os
 import sys
+import requests
 
 # database intialization
 from modules.database import NetworkDB
@@ -77,7 +78,74 @@ def destroy_nodes():
 
 @app.route("/send_packet", methods=["POST"])
 def send_packet():
-    pass
+    if 'msg' not in request.json:
+        return jsonify(
+            error=True,
+            code='invalid_request'
+        )
+
+    if request.json['msg'] == "":
+        return jsonify(
+            error=True,
+            code='invalid_msg'
+        )
+
+    # check if session exists
+    sessionExists = NodeHandler.sessionExists()
+    if not sessionExists:
+        return jsonify(
+            error=True,
+            code='session_not_exists'
+        )
+
+    message = request.json['msg']
+
+    # get current session
+    nodeArr = NodeHandler.getNodes()
+    
+    payoad_sent = False
+    if len(nodeArr) > 1:
+        # prepare payload
+        payload = {
+            'message': message,
+            'routes' : {},
+            'from'   : 'OBSERVER'
+        }
+
+        next_ip = nodeArr[0].getIP()
+        next_host=nodeArr[0].getHost('/set_packet')
+
+        for node in nodeArr:
+            curr_node = node.getName()
+            curr_ip   = node.getIP()
+            next_node = node.getNext()
+            next_route= node.getHost('/set_packet')
+
+            payload['routes'][curr_node] = {
+                'ip' : curr_ip,
+                'recieved': False,
+                'next' : next_node,
+                'next_host' : next_route,
+            }
+
+        if next_ip is not None:
+            try:
+                resp = requests.post( next_host, data=payload )
+                print(resp.json)
+                payload_sent=True
+            except Exception as ex:
+                print(ex)
+                print(payload)
+                payload_sent=False,
+            finally:
+                pass
+
+
+    return jsonify(
+        error=False,
+        code='packet_sent',
+        sent=payoad_sent,
+    )
 
 @app.route("/set_status", methods=["POST"])
 def set_status():

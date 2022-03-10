@@ -21,10 +21,10 @@ class Node:
         return self.index
 
     def getStart(self):
-        return self.start
+        return self.name
 
-    def getEnd(self):
-        return self.end
+    def getNext(self):
+        return self.sendto
 
     def destroy(self):
         pass
@@ -41,6 +41,10 @@ class Node:
                 "dockerfile": "Dockerfile",
             },
             "container_name": router_name,
+            "environment": {
+                "ROUTER_NAME": self.name,
+                "ROUTER_IP": getIP,
+            },
             "ports": [
                 str(getPort) + ":8080"
             ],
@@ -55,6 +59,11 @@ class Node:
 
     def getIP(self):
         return ipStart + str(self.index)
+
+    def getHost(self, path=""):
+        ip = self.getIP()
+        port = self.getPort()
+        return "http://{ip}:{port}{path}".format(ip=ip, port=port, path=path)
     
     def getPort(self):
         return "80" + str(self.index)

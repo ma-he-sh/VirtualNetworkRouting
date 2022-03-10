@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>ROUTER {{router_name}}</title>
+        <script src="{{ url_for('static', filename='assets/jquery-3.6.0.min.js')  }}"></script>
+    </head>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #0e141f;
+        }
+        .router--window {
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .router--content {
+            width: 100%;
+            min-height: 120px;
+            border-radius: 5px;
+            background-color: #485a6c;
+        }
+        .router--content.recieved {
+            background-color: #0d52bf;
+        }
+        .router--content .router--name,
+        .router--content .router--ip,
+        .router--content .router--message,
+        .router--content .router--timestamp {
+            width: 100%;
+            line-height: 40px;
+            text-align: center;
+            color: #fff;
+        }
+        .router--content .router--name {
+            font-size: 24px;
+        }
+        .router--content .router--ip {
+            font-size: 16px;
+        }
+        .router--content .router--message {
+            font-size: 16px;
+        }
+        .router--content .router--timestamp {
+            font-size: 16px;
+        }
+    </style>
+    <body>
+        <div id='router--window' class='router--window'>
+            <div class='router--content'>
+                <div class='router--name'>ROUTER {{router_name}}</div>
+                <div class='router--ip'>ROUTER {{router_ip}}</div>
+                <div data-content='message' class='router--message'></div>
+                <div data-content='timestamp' class='router--timestamp'></div>
+            </div>
+        </div>
+        <script>
+            function rest( url, type, data={} ) {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: url,
+                        type: type,
+                        data: JSON.stringify(data),
+                        contentType: 'application/json',
+                        success: resolve,
+                        error: reject
+                    })
+                });
+            }
+            let reload = setInterval(function() {
+                var data = {
+                    'req': 'status'
+                }
+                rest("/status", "get", data ).then(function(resp) {
+                    if( resp.status ) {
+                        if( resp.has_message ) {
+                            jQuery('#router--window .router--content').addClass('recieved');
+                            jQuery('[data-content="message"]').html(resp.router_message);
+                            jQuery('[data-content="timestamp"]').html(resp.router_timestamp);
+                        }
+                    }
+                }).catch(function(err) {
+                    console.log(err)
+                }).finally(function(){
+
+                });
+            }, 400 );
+        </script>
+    </body>
+</html>

@@ -1,4 +1,5 @@
 from sys import stderr, stdout
+import sys
 import yaml
 import io
 from os import path
@@ -33,9 +34,25 @@ class Dockerize:
         with io.open( self.docker_file_name, "w", encoding="utf8" ) as file:
             yaml.dump( entry, file, default_flow_style=False, allow_unicode=True )
 
-    def exec(self):
+    def exec(self, rebuild=False):
+        pidstdout = 0
         if path.exists( self.docker_file_name ):
-            process = subprocess.Popen(['docker-compose', '-f', self.docker_file_name, 'up'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = process.communicate()
-            print(stdout, stderr)
-            print("STARTED")
+            if rebuild:
+                process = subprocess.Popen(['docker-compose', '-f', self.docker_file_name, 'up', '-d', '--no-deps', '--build'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            else:
+                process = subprocess.Popen(['docker-compose', '-f', self.docker_file_name, 'up', '-d'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            pidstdout, stderr = process.communicate()
+            if len(pidstdout.splitlines()) > 0:
+                sys.exit(0)
+        return pidstdout
+
+    @staticmethod
+    def shutdown(sess_name):
+        docker_file_name = CONTAINER_DIR + "docker-composer-" + sess_name + ".yaml"
+
+        if path.exists( docker_file_name ):
+            process = subprocess.Popen(['docker-compose', '-f', docker_file_name, 'down'])
+            pidstdout, stderr = process.communicate()
+            if len(pidstdout.splitlines()) > 0:
+                sys.exit(0)
+        return True
