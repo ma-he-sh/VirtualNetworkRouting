@@ -27,7 +27,7 @@ def create_tables():
 
 @app.route("/", methods= ["POST", "GET"])
 def login():
-        return render_template("in.html")
+        return render_template("index.html")
 
 @app.route("/total", methods=["POST", "GET"])
 def total():
@@ -35,7 +35,7 @@ def total():
         total= request.form["Node"]
         return render_template("cost.html", total= total)
     else:
-        return "hi"
+        return 404
 
 
 @app.route("/grab", methods=["POST", "GET"])

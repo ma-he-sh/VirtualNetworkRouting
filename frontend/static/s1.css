@@ -64,6 +64,7 @@ td{
  }
  .hon{
 	 text-align: center;
+	 padding-top: 100px;
  }
 
  .add{
@@ -77,13 +78,14 @@ td{
 	} 
 
  table{
-	 float: left;
-	position: absolute;
-	left: 50%;
-	transform: translatex(-50%);
-	width:20%;
 	text-align: center;
-	margin-top: 13%;
+margin-top: 13%;
+max-width: 665px;
+min-width: 329px;
+display: block;
+margin-left: auto;
+margin-right: auto;
+width: 100%;
 	}
 	button{
 		float: left;
