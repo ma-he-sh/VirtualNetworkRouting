@@ -102,8 +102,6 @@ class PathGen {
             jQuery(`#${this.net_path}`).html( path_string );
         }
 
-        console.log( path_map )
-
         return data;
     }
 
