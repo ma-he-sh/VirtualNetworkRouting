@@ -4,6 +4,8 @@
         <meta charset="utf-8">
         <title>Virtual Network Routing</title>
         <script src="{{ url_for('static', filename='assets/jquery-3.6.0.min.js')  }}"></script>
+        <script src="{{ url_for('static', filename='assets/sweetalert.min.js')  }}"></script>
+        <script src="{{ url_for('static', filename='assets/vis-network.min.js')  }}"></script>
     </head>
     <style>
         body {
@@ -37,16 +39,10 @@
             margin-bottom: 10px;
             float: left;
         }
-        .app--window .distance_vector_network {
-            width: 100%;
-            float: left;
-            background-color: #273445;
-            margin-bottom: 10px;
-            border-radius: 2.5px;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        .app--window .distance_vector_combinations {
+        .app--window .distance_vector_network,
+        .app--window .distance_vector_combinations,
+        .app--window .distance_node_visualization,
+        .app--window .distance_node_path {
             width: 100%;
             float: left;
             background-color: #273445;
@@ -57,10 +53,28 @@
         }
         .app--window .distance_vector_combinations .app--section,
         .app--window .distance_vector_network .app--section,
-        .app--window .distance_vector_deploy .app--section  {
+        .app--window .distance_vector_deploy .app--section,
+        .app--window .distance_node_visualization .app--section,
+        .app--window .distance_node_path .app--section  {
             width: 100%;
             float: left;
             padding: 0px 0px 10px 0px;
+        }
+
+        .app--window .distance_node_path .app--section #app--route--path {
+            color: #eee;
+            font-size: 12px;
+        }
+
+        .app--window .distance_node_visualization {
+            background-color: #eee;
+        }
+        .app--window .distance_node_visualization .app--create-comb {
+            color: #0e141f;
+        }
+
+        .display--none {
+            display: none;
         }
 
         .app--window #app--nodes,
@@ -106,11 +120,13 @@
             box-sizing: border-box;
         }
 
-        .app--window #app--create-comb {
+        .app--window .app--create-comb {
             color: #fff;
         }
         .app--window #app--add-node,
-        .app--window #app--create-deploy {
+        .app--window #app--create-deploy,
+        .app--window #app--send-msg,
+        .app--window #app--reset {
             width: 120px;
             color: #fff;
             line-height: 24px;
@@ -120,8 +136,20 @@
             background-color: #002e99;
         }
         .app--window #app--add-node:hover,
-        .app--window #app--create-deploy:hover {
+        .app--window #app--create-deploy:hover,
+        .app--window #app--send-msg:hover,
+        .app--window #app--reset:hover {
             background-color: #0d52bf;
+        }
+        .app--send-message {
+            width: 100%;
+            height: 24px;
+            border-style: none;
+            float: left;
+            line-height: 24px;
+            border-radius: 2.5px;
+            text-indent: 10px;
+            box-sizing: border-box;
         }
     </style>
     <body class="app--window">
@@ -134,7 +162,7 @@
         <!--node combinations-->
         <div class="distance_vector_combinations">
             <section class="app--section">
-                <div id="app--create-comb">COMBINATION</div> 
+                <div class="app--create-comb">COMBINATION</div> 
                 <div id="app--nodes--comb"></div>
             </section>
         </div>
@@ -142,6 +170,30 @@
         <div class="distance_vector_deploy">
             <section class="app--section">
                 <div id="app--create-deploy">DEPLOY</div> 
+            </section>
+        </div>
+        <!--node visualization-->
+        <div data-vis="visualization" class="distance_node_visualization display--none">
+            <section class="app--section">
+                <div class="app--create-comb">PROPOSED ROUTING</div> 
+                <div id="app--proposed--path"></div>
+            </section>
+        </div>
+        <!-- node path-->
+        <div data-vis="distance_node" class="distance_node_path display--none">
+            <section class="app--section">
+                <div id="app--route--path"></div>
+            </section>
+        </div>
+        <div data-vis="distance_path" class="distance_node_path display--none">
+            <section class="app--section">
+                <input id="send_message" class="app--send-message" value=""/>
+            </section>
+            <section class="app--section">
+                <div id="app--send-msg">SEND PAYLOAD</div>
+            </section>
+            <section class="app--section">
+                <div id="app--reset">RESET</div>
             </section>
         </div>
     </body>

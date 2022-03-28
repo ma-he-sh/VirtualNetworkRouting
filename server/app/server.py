@@ -136,9 +136,9 @@ def send_packet():
                 data = resp.json()
                 payload_sent=bool(data['recieved'])
             except Exception as ex:
-                print(ex)
-                print(next_host)
-                print(payload)
+                #print(ex)
+                #print(next_host)
+                #print(payload)
                 payload_sent=False,
             finally:
                 pass

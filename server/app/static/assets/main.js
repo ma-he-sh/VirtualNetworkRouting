@@ -1,5 +1,122 @@
+class PathGen {
+    section="app--proposed--path";
+    net_path="app--route--path";
+
+    constructor(start, end, path=[], data=[]) {
+        this.start = start;
+        this.end   = end;
+        this.path  = path;
+        this.data  = data;
+        this.el = document.getElementById( this.section );
+        this.network = null;
+    }
+
+    init() {
+        console.log("initization");
+        this.clear();
+
+        var data = this.calc();
+        this.network = new vis.Network( this.el, data, {
+            nodes: {
+                shape: "dot",
+            }
+        } );
+    }
+
+    calc() {
+        var data = {
+            nodes: [],
+            edges: [],
+        }
+
+        var index_map = {}
+        var path_map  = {}
+
+        if( this.data.nodes.length > 0 ) {
+            this.data.nodes.forEach( function( label, index ) {
+                index_map[label] = index;
+                data.nodes.push( {
+                    id: index,
+                    label: label
+                } );
+            } );
+        }
+
+        if( this.data.cost.length > 0 ) {
+            this.data.cost.forEach( function( nodes, index ) {
+                var node1_index = index_map[nodes.node1];
+                var node2_index = index_map[nodes.node2];
+                if( !isNaN(nodes.cost) ) {
+                    var push_index = data.edges.push({
+                        from: node1_index,
+                        to: node2_index,
+                        value: 2,
+                        label: nodes.cost
+                    });
+
+                    path_map[ `${nodes.node1}_${nodes.node2}` ] = {
+                        index: push_index - 1,
+                        cost: nodes.cost
+                    }
+                }
+            } );
+        }
+
+        // path handle
+        if( this.path.length > 0 ) {
+            var path_string = "";
+            var combo = [];
+
+            var observer_index = this.path.indexOf("OBSERVER");
+            if( observer_index > 0 ) {
+                this.path.splice(observer_index, 1);
+            }
+
+            var index = 1;
+            var start = this.path[0];
+
+            path_string += `${start}`;
+            while( index < this.path.length ) {
+                var end = this.path[index];
+
+                var from_edge = index_map[start];
+                var to_edge   = index_map[end];
+
+                path_string += ` => ${end}`;
+
+                var orignal_index = path_map[ `${start}_${end}` ].index;
+                var orignal_cost  = path_map[ `${start}_${end}` ].cost;
+
+                data.edges[orignal_index] = {
+                    from: from_edge,
+                    to: to_edge,
+                    value: 6,
+                    label: orignal_cost
+                };
+
+                start = end;
+                index++;
+            }
+
+            // render the path
+            jQuery(`#${this.net_path}`).html( path_string );
+        }
+
+        console.log( path_map )
+
+        return data;
+    }
+
+    clear() {
+        jQuery( `#${this.section}` ).html("");
+        jQuery( `#${this.net_path}` ).html("");
+        jQuery("[data-vis]").removeClass("display--none");
+    }
+}
+
 (function($){
     console.log("---loaded---");
+    var pathgen = null;
 
     const app_nodes = "#app--nodes";
     const app_nodes_comb = "#app--nodes--comb";
@@ -95,77 +212,54 @@
             }
 
             rest( "/deploy_nodes", "post", data ).then(function(res) {
-                console.log(res)
-            }).catch(function(err) {
+                if( res.hasOwnProperty('code') && res.code == "path_generated" ) {
+                    return {
+                        'data': data,
+                        'start': res.start,
+                        'end' : res.end,
+                        'path': res.path
+                    }
+                }
+            })
+            .then(function(nodes) {
+                pathgen = new PathGen( nodes.start, nodes.end, nodes.path, nodes.data );
+                pathgen.init();
+            })
+            .catch(function(err) {
                 console.log(err)
             }).finally(function() {
                 save_combo = [];
             });
         } else {
             console.error("Invalid Node Size");
+            swal("Error : Invalid Node Size", "Something went wrong, please try again", "warning");
         }
     });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    $( "button[data-action]" ).on("click", function() {
-        var _action = $(this).data("action")
-        switch( _action ){
-            case "create_node":
-                create_node()
-                break
-            case "reset_data":
-                nodes = []
-                break
-            case "deploy_nodes":
-                deploy_nodes()
-                break
-            default:
-                print("no action")
-        }
-    });
-
-    function create_node() {
-        var node_cost = parseInt( $('input[name="node_cost"]').val() );
-        var node_name = $('input[name="node_name"]').val();
-        if (node_cost && node_name) {
-            nodes.push({
-                "cost": node_cost,
-                "name": node_name
-            });
-            console.log(nodes)
-        }
-    }
-
-    async function deploy_nodes() {
-        if( nodes.length > 0 ) {
-            rest( "/deploy_nodes", "post", {
-                "nodes": nodes
-            } ).then(function(res) {
-                console.log(res)
-            }).catch(function(err) {
-                console.log(err)
+    $( "div#app--send-msg" ).on( "click", function() {
+        var payload = $( "#send_message" ).val();
+        if( payload.length > 0 ) {
+            var data = {
+                'msg': payload
+            }
+            rest("/send_packet", "post", data ).then(function(res){
+                if( res.sent ) {
+                    swal("Packet Sent", "Packet sent successfully", "success")
+                    .then(function(res){
+                        if(res){
+                            $( "#send_message" ).val("");
+                        }
+                    });
+                }
+            }).catch(function(err){
+                swal("Error: Message Not Sent", "Something went wrong, please try again", "warning");
             }).finally(function() {
-                nodes = [] // clear
-            })
+
+            });
         }
-    }
+    } );
+
+    $( "div#app--reset" ).on("click", function() {
+        location.reload();
+    });
 })(jQuery);
